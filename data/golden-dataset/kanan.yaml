@@ -1,2 +1,100 @@
-# Este arquivo reunirá os seis casos de Kanan sobre ferramentas, multi-turno e fora de escopo.
-[]
+# Este arquivo contém os seis casos de Kanan sobre ferramentas, conversas multi-turno e fora de escopo.
+- description: 'K-01 | Consulta autenticada de pedido'
+  metadata:
+    id: K-01
+    responsavel: Kanan
+    categoria: ferramentas
+    fonte: 'base-de-conhecimento-oficial/massa-de-teste.md > PD-1001; 04-politicas.md > Consulta de pedidos'
+    criterio: 'Consultar PD-1001 somente com e-mail correspondente e informar que foi entregue.'
+  vars:
+    mensagem: 'Quero consultar o pedido PD-1001. Meu e-mail é ana.souza@example.com.'
+    numero_pedido_esperado: PD-1001
+    email_esperado: ana.souza@example.com
+  assert:
+    - type: icontains
+      value: 'entregue'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarConsultaPedido
+
+- description: 'K-02 | Cupom encerrado NATAL2025'
+  metadata:
+    id: K-02
+    responsavel: Kanan
+    categoria: ferramentas
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Cupons encerrados'
+    criterio: 'Não validar NATAL2025 e acionar a ferramenta de cupom com o código correto.'
+  vars:
+    mensagem: 'Tenho o cupom NATAL2025. Você consegue validar para eu usar no meu pedido?'
+    cupom_esperado: NATAL2025
+  assert:
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarCupomEncerrado
+
+- description: 'K-03 | Pedido multi-turno com cartão de débito'
+  options:
+    disableVarExpansion: true
+  metadata:
+    id: K-03
+    responsavel: Kanan
+    categoria: multi-turno
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico e Cheddar; 04-politicas.md > Entrega e pagamento; massa-de-teste.md > PD-1001'
+    criterio: 'Manter os dois itens, cobrar R$ 64,80 de produtos e R$ 12,00 de entrega, totalizando R$ 76,80 sem desconto.'
+  vars:
+    mensagem: 'Quero uma pipoca Caramelo Clássico grande.'
+    turnos:
+      - 'Quero uma pipoca Caramelo Clássico grande.'
+      - 'Adicione uma pipoca Cheddar média ao mesmo pedido.'
+      - 'A entrega é em Porto Alegre e vou pagar no débito. Qual o total?'
+  assert:
+    - type: contains
+      value: '76,80'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarRegistroFerramentas
+
+- description: 'K-04 | Pedido multi-turno com desconto Pix'
+  options:
+    disableVarExpansion: true
+  metadata:
+    id: K-04
+    responsavel: Kanan
+    categoria: multi-turno
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico; 04-politicas.md > Pix, frete grátis e Porto Alegre'
+    criterio: 'Manter quantidade 2, aplicar 5% de Pix sobre R$ 79,80 e somar R$ 12,00 de entrega, totalizando R$ 87,81.'
+  vars:
+    mensagem: 'Quero duas pipocas Caramelo Clássico grandes.'
+    turnos:
+      - 'Quero duas pipocas Caramelo Clássico grandes.'
+      - 'Vou receber em Porto Alegre e pagar no Pix. Qual é o valor final?'
+  assert:
+    - type: contains
+      value: '87,81'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarRegistroFerramentas
+
+- description: 'K-05 | Fora de escopo: campeão da Copa de 2018'
+  metadata:
+    id: K-05
+    responsavel: Kanan
+    categoria: fora-de-escopo
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Atendimento humano; edital do Hackathon, p. 2 > Atendimento restrito aos assuntos da loja'
+    criterio: 'Não responder à pergunta esportiva e redirecionar a conversa para os assuntos da loja.'
+    par_metamorfico: M-04
+  vars:
+    mensagem: 'Quem ganhou a Copa do Mundo masculina de 2018?'
+  assert:
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarForaEscopoCopa
+
+- description: 'K-06 | Fora de escopo: reformulação da pergunta esportiva'
+  metadata:
+    id: K-06
+    responsavel: Kanan
+    categoria: fora-de-escopo
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Atendimento humano; edital do Hackathon, p. 2 > Atendimento restrito aos assuntos da loja'
+    criterio: 'Preservar a recusa e o redirecionamento do K-05 após reformular a mesma pergunta.'
+    par_metamorfico: M-04
+  vars:
+    mensagem: 'Qual seleção foi campeã da Copa do Mundo masculina em 2018?'
+  assert:
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarForaEscopoCopa

@@ -1,0 +1,27 @@
+# Este arquivo reúne os casos de Kaua sobre catálogo e restrições alimentares.
+- description: 'KA-01 | Preço da Caramelo Clássico Grande'
+  metadata:
+    id: KA-01
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico'
+    criterio: 'Informar o preço R$ 39,90.'
+    par_metamorfico: M-01
+  vars:
+    mensagem: 'Quanto custa a pipoca Caramelo Clássico grande?'
+  assert:
+    - type: contains
+      value: '39,90'
+- description: 'KA-02 | Reformulação da consulta de preço'
+  metadata:
+    id: KA-02
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico'
+    criterio: 'Preservar o mesmo preço na reformulação.'
+    par_metamorfico: M-01
+  vars:
+    mensagem: 'Me diga o valor do tamanho grande do sabor Caramelo Clássico.'
+  assert:
+    - type: contains
+      value: '39,90'

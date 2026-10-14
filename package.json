@@ -1,0 +1,19 @@
+{
+  "name": "hackathon-pop-doce-qe",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Este arquivo define os comandos e dependências da automação do Hackathon.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test tests-local/*.test.cjs",
+    "smoke": "node scripts/smoke-test.cjs",
+    "eval:original": "promptfoo eval -c promptfooconfig.yaml -o resultados/original/avaliacao.json",
+    "eval:corrigida": "promptfoo eval -c promptfooconfig.corrigida.yaml -o resultados/corrigida/avaliacao.json",
+    "view": "promptfoo view"
+  },
+  "devDependencies": {
+    "promptfoo": "^0.123.1"
+  }
+}

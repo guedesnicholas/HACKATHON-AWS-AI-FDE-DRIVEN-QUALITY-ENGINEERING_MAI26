@@ -1,0 +1,15 @@
+# Este arquivo configura a avaliação automatizada da versão original da Lia.
+description: 'Lia - avaliação original'
+prompts:
+  - '{{mensagem}}'
+providers:
+  - id: file://./src/promptfoo-provider.cjs
+    label: 'Lia original'
+    config:
+      versao: original
+tests:
+  - file://./data/golden-dataset/*.yaml
+evaluateOptions:
+  repeat: 3
+  maxConcurrency: 4
+  cache: false

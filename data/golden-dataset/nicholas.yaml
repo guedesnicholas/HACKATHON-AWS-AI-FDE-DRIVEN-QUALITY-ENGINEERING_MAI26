@@ -8,10 +8,10 @@
     fonte: 'base-de-conhecimento-oficial/05-perguntas-frequentes.md > Pedidos, entrega e pagamento'
     criterio: 'Informar ao assistente o número do pedido no formato PD-0000 e o e-mail usado na compra.'
   vars:
-    mensagem: 'Quero consultar o status do meu pedido PD-1234. Meu e-mail é cliente@example.com.'
+    mensagem: 'Quero consultar o status do meu pedido PD-1025. Meu e-mail é daniela.fontes@example.com.'
   assert:
     - type: contains
-      value: 'PD-1234'
+      value: 'PD-1025'
 - 
  - description: 'PRIV-02 | Validação Estrita de E-mail na Consulta'
    metadata:

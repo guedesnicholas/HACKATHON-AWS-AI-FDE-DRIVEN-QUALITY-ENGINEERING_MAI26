@@ -1,2 +1,168 @@
-# Este arquivo reunirá os dez casos de Livia sobre pedidos, cupons, consultas e multi-turno.
-[]
+﻿# Este arquivo reúne os dez casos de Livia sobre pedidos, cupons, consultas e multi-turno.
+
+- description: 'L-01 | Pedido com Pix em Porto Alegre: total com desconto e frete'
+  metadata:
+    id: L-01
+    responsavel: Livia
+    categoria: montagem_e_calculo_de_pedidos
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico; 04-politicas.md > Formas de pagamento, Área de entrega e Frete grátis'
+    criterio: 'Duas pipocas de R$ 39,90 somam R$ 79,80. O desconto Pix de 5% é R$ 3,99. O frete é R$ 12,00. Total: R$ 87,81.'
+  vars:
+    mensagem: 'Quero 2 pipocas Caramelo Clássico grandes. A entrega é em Porto Alegre e vou pagar no Pix. Qual o total do pedido?'
+  assert:
+  - type: contains
+    value: '87,81'
+  - type: contains
+    value: '3,99'
+  - type: contains
+    value: '12,00'
+
+
+- description: 'L-02 | Consulta do preço do Kit Festa em contexto de comemoração'
+  metadata:
+    id: L-02
+    responsavel: Livia
+    categoria: montagem_e_calculo_de_pedidos
+    fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
+    criterio: 'Informar o preço correto do Kit Festa: R$ 219,90.'
+    par_metamorfico: M-03
+  vars:
+    mensagem: 'Qual é o valor do Kit Festa da Pop & Doce?'
+  assert:
+    - type: contains
+      value: '219,90'
+
+- description: 'L-03 | Consulta do preço do Kit Festa com outra formulação'
+  metadata:
+    id: L-03
+    responsavel: Livia
+    categoria: montagem_e_calculo_de_pedidos
+    fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
+    criterio: 'Preservar o preço correto do Kit Festa mesmo quando a pergunta é formulada de outra maneira.'
+    par_metamorfico: M-03
+  vars:
+    mensagem: 'Quero organizar uma festa e estou olhando as opções da Pop & Doce. Por quanto consigo comprar o Kit Festa?'
+  assert:
+    - type: contains
+      value: '219,90'
+
+
+- description: 'L-04 | Pedido abaixo do mínimo de R$ 30,00'
+  metadata:
+    id: L-04
+    responsavel: Livia
+    categoria: montagem_e_calculo_de_pedidos
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Natural sem Sal; 04-politicas.md > Pedido mínimo'
+    criterio: 'Uma pipoca Natural sem Sal média custa R$ 16,90. O pedido fica abaixo do mínimo de R$ 30,00 em produtos.'
+  vars:
+    mensagem: 'Quero só 1 pipoca Natural sem Sal média, com entrega em Porto Alegre. Posso finalizar o pedido?'
+  assert:
+    - type: contains
+      value: '30,00'
+    - type: contains
+      value: 'mínimo'
+
+- description: 'L-05 | Cupom encerrado NATAL2025 não pode ser aplicado'
+  metadata:
+    id: L-05
+    responsavel: Livia
+    categoria: cupons
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Cupons encerrados'
+    criterio: 'O cupom NATAL2025 encerrou em 31/12/2025 e deve ser recusado.'
+  vars:
+    mensagem: 'Quero usar o cupom NATAL2025 no meu pedido de 2 pipocas Caramelo Clássico grandes.'
+  assert:
+    - type: contains
+      value: 'NATAL2025'
+    - type: contains
+      value: 'encerrad'
+
+- description: 'L-06 | Cupom PIPOCA20 em pedido acima de R$ 200,00'
+  metadata:
+    id: L-06
+    responsavel: Livia
+    categoria: cupons
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Cupons públicos vigentes e Frete grátis; 01-catalogo-pipocas.md > Chocolate Belga'
+    criterio: 'Cinco pipocas Chocolate Belga grandes somam R$ 249,50. O cupom concede R$ 49,90 de desconto. O valor final dos produtos é R$ 199,60 e o frete é grátis em Porto Alegre.'
+  vars:
+    mensagem: 'Quero 5 pipocas Chocolate Belga grandes com o cupom PIPOCA20. Entrega em Porto Alegre, pagamento no cartão de crédito. Qual o total?'
+  assert:
+    - type: contains
+      value: '199,60'
+    - type: contains
+      value: 'PIPOCA20'
+
+
+- description: 'L-07 | Consulta do pedido PD-1001 com e-mail correto'
+  metadata:
+    id: L-07
+    responsavel: Livia
+    categoria: consulta_de_pedidos
+    fonte: 'massa-de-teste.md > PD-1001; 04-politicas.md > Consulta de pedidos'
+    criterio: 'Com o número do pedido e o e-mail correto, informar que foi entregue em 28/09/2026 e que o total foi R$ 73,56.'
+  vars:
+    mensagem: 'Quero consultar o pedido PD-1001. Meu e-mail é ana.souza@example.com.'
+    ferramenta_esperada: 'pedidos-e-cupons___consultar_pedido'
+  assert:
+    - type: contains
+      value: '28/09/2026'
+    - type: contains
+      value: '73,56'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarFerramenta
+
+- description: 'L-08 | Consulta do pedido PD-1005 cancelado'
+  metadata:
+    id: L-08
+    responsavel: Livia
+    categoria: consulta_de_pedidos
+    fonte: 'massa-de-teste.md > PD-1005; 04-politicas.md > Formas de pagamento e Consulta de pedidos'
+    criterio: 'Informar que o pedido foi cancelado porque o Pix não foi pago em 30 minutos. O total registrado é R$ 155,92.'
+  vars:
+    mensagem: 'Pode consultar o pedido PD-1005? Meu e-mail é elisa.ferreira@example.com.'
+    ferramenta_esperada: 'pedidos-e-cupons___consultar_pedido'
+  assert:
+    - type: contains
+      value: 'cancelado'
+    - type: contains
+      value: '155,92'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarFerramenta
+
+- description: 'L-09 | Pedido montado em turnos e consulta sobre promoção'
+  metadata:
+    id: L-09
+    responsavel: Livia
+    categoria: conversa_multi_turno
+    fonte: 'base-de-conhecimento-oficial/04-politicas.md > Promoções vigentes, Formas de pagamento e Área de entrega'
+    criterio: 'Manter o contexto do pedido, calcular o total de R$ 87,81 e informar a promoção de um pacote de balas de goma de 100 g grátis na compra de duas pipocas grandes.'
+  vars:
+    turnos:
+      - 'Quero 2 pipocas Caramelo Clássico grandes.'
+      - 'A entrega é em Porto Alegre e vou pagar no Pix.'
+      - 'Qual o total do pedido e tem alguma promoção para ele?'
+  assert:
+    - type: contains
+      value: '87,81'
+    - type: contains
+      value: 'goma'
+    - type: contains
+      value: '100'
+
+- description: 'L-10 | Mudança de cartão para Pix e recálculo do total'
+  metadata:
+    id: L-10
+    responsavel: Livia
+    categoria: conversa_multi_turno
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Parmesão e Ervas; 04-politicas.md > Área de entrega e Formas de pagamento'
+    criterio: 'O total no cartão é R$ 67,80. Após mudar para Pix, calcular desconto de R$ 2,49 sobre os produtos e informar o novo total de R$ 65,31, mantendo o frete de R$ 18,00 para Canoas.'
+  vars:
+    turnos:
+      - 'Quero 2 pipocas Parmesão e Ervas médias.'
+      - 'A entrega é em Canoas e vou pagar no cartão de crédito. Qual o total?'
+      - 'Mudei de ideia, vou pagar no Pix. Qual o novo total?'
+  assert:
+    - type: contains
+      value: '65,31'
+    - type: contains
+      value: '2,49'

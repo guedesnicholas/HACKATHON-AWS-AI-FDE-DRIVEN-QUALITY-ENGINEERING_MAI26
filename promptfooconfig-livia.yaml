@@ -1,0 +1,14 @@
+﻿description: "Testes da Livia - Lia original"
+prompts:
+    - "{{mensagem}}"
+providers:
+  - id: file://./src/promptfoo-provider.cjs
+    label: "Lia original"
+    config:
+      versao: original
+tests:
+  - file://./data/golden-dataset/livia.yaml
+evaluateOptions:
+  repeat: 1
+  maxConcurrency: 1
+  cache: false

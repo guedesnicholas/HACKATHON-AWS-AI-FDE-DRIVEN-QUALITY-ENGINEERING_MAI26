@@ -29,3 +29,87 @@ test('fora do escopo recusa conteúdo esportivo e orienta loja', () => {
   assert.equal(a.verificarForaEscopoCopa('Posso ajudar com produtos da loja.').pass,true);
   assert.equal(a.verificarForaEscopoCopa('Foi a França; temos pipocas.').pass,false);
 });
+
+// Confere a leitura e a validação dos registros de ferramentas.
+test('valida estrutura dos registros de ferramentas', () => {
+  const ferramentas = [{
+    ferramenta: 'base-pop-e-doce___Retrieve',
+    entrada: {
+      retrievalQuery: {
+        text: 'Preço da pipoca Caramelo Clássico'
+      }
+    }
+  }];
+
+  const contexto = {
+    providerResponse: {
+      metadata: { ferramentas }
+    }
+  };
+
+  assert.equal(
+    a.verificarRegistroFerramentas('', contexto).pass,
+    true
+  );
+
+  assert.equal(
+    a.verificarRegistroFerramentas('', {}).pass,
+    false
+  );
+
+  assert.equal(
+    a.verificarRegistroFerramentas('', {
+      metadata: {
+        ferramentas: [{ ferramenta: '', entrada: {} }]
+      }
+    }).pass,
+    false
+  );
+});
+
+// Testa a recusa textual de um cupom encerrado.
+test('recusa cupom encerrado corretamente', () => {
+  assert.equal(
+    a.verificarRecusaCupom('O cupom NATAL2025 está encerrado.').pass,
+    true
+  );
+
+  assert.equal(
+    a.verificarRecusaCupom('Qual é o valor do seu pedido?').pass,
+    false
+  );
+});
+
+test('fora de escopo identifica variacoes da resposta esportiva', () => {
+  // Recusa adequada
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'Nao respondo perguntas sobre futebol. Posso ajudar com os produtos da loja.'
+    ).pass,
+    true
+  );
+
+  // Responde a pergunta, mesmo mencionando a loja
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'Foi a selecao francesa. Posso ajudar com seu pedido?'
+    ).pass,
+    false
+  );
+
+  // Outra forma de informar o resultado
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'France won in 2018. Temos pipocas!'
+    ).pass,
+    false
+  );
+
+  // Nao responde, mas tambem nao redireciona
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'Nao posso responder essa pergunta.'
+    ).pass,
+    false
+  );
+});

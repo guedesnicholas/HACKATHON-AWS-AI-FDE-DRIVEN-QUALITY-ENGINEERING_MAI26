@@ -26,9 +26,11 @@
   vars:
     mensagem: 'Tenho o cupom NATAL2025. Você consegue validar para eu usar no meu pedido?'
     cupom_esperado: NATAL2025
-  assert:
+    assert:
     - type: javascript
-      value: file://./src/assercoes.cjs:verificarCupomEncerrado
+      value: file://./src/assercoes.cjs:verificarRecusaCupom
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarRegistroFerramentas
 
 - description: 'K-03 | Pedido multi-turno com cartão de débito'
   options:

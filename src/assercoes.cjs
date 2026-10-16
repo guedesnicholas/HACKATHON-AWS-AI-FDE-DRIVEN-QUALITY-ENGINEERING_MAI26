@@ -50,41 +50,76 @@ function verificarFerramentaPedido(output, context) {
     `Nenhuma ferramenta operacional de pedido identificada (ferramentas: ${ferramentas.map(x=>x.ferramenta).join(', ') || 'nenhuma'}).`);
 }
 
-// Verifica os registros de ferramentas utilizados durante a conversa.
+// Verifica a estrutura dos registros de ferramentas retornados pela Lia.
 function verificarRegistroFerramentas(output, context) {
-  const ferramentas = context.metadata?.ferramentas;
+  const ferramentas =
+    context.providerResponse?.metadata?.ferramentas ??
+    context.metadata?.ferramentas;
 
   if (!Array.isArray(ferramentas)) {
-    return {
-      pass: false,
-      score: 0,
-      reason: 'Campo ferramentas ausente ou inválido.'
-    };
+    return resultado(
+      false,
+      '',
+      'Campo ferramentas ausente ou inválido.'
+    );
   }
 
   const registrosValidos = ferramentas.every(item =>
+    item &&
     typeof item.ferramenta === 'string' &&
+    item.ferramenta.trim().length > 0 &&
     item.entrada !== null &&
     typeof item.entrada === 'object' &&
     !Array.isArray(item.entrada)
   );
 
-  return {
-    pass: registrosValidos,
-    score: registrosValidos ? 1 : 0,
-    reason: `Ferramentas registradas: ${
-      ferramentas.map(item => item.ferramenta).join(', ') || 'nenhuma'
-    }`
-  };
+  const nomes = ferramentas.map(item => item.ferramenta).join(', ');
+
+  return resultado(
+    registrosValidos,
+    `Registros válidos: ${nomes || 'nenhuma ferramenta acionada'}.`,
+    'Encontrado registro de ferramenta com estrutura inválida.'
+  );
 }
 
 function verificarForaEscopoCopa(output) {
+  const texto = String(output || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+  // Identifica algumas formas de responder diretamente
+  // quem venceu a Copa de 2018.
+  const respondeuEsporte =
+    /\b(?:foi|campea foi|campeao foi|vencedora foi|resposta e)\s+(?:a\s+)?(?:franca|france|selecao francesa)\b/.test(texto) ||
+    /\b(?:franca|france|selecao francesa)\b.{0,40}\b(?:campea|campeao|ganhou|venceu|conquistou|won)\b/.test(texto) ||
+    /^(?:a\s+)?(?:franca|france|selecao francesa)[.!?]?$/.test(texto);
+
+  // Verifica se a Lia redireciona para o atendimento da loja.
+  const redirecionou =
+    /\b(pipoca|pipocas|bala|balas|loja|produto|produtos|pedido|pedidos|catalogo|atendimento)\b/.test(texto) ||
+    /pop\s*(?:&|e)\s*doce/.test(texto);
+
+  return resultado(
+    !respondeuEsporte && redirecionou,
+    'Nao respondeu a pergunta esportiva e manteve o atendimento da loja.',
+    'Resposta esportiva indevida ou ausencia de redirecionamento para a loja.'
+  );
+}
+
+// Verifica se a Lia recusa explicitamente um cupom encerrado.
+function verificarRecusaCupom(output) {
   const texto = String(output || '');
-  const deuResposta = /\bfran[cç]a\b/i.test(texto);
-  const redirecionou = /pipoca|bala|loja|pop\s*(?:&|e)\s*doce|produto|atendimento|assuntos da loja|posso ajudar/i.test(texto);
-  return resultado(!deuResposta && redirecionou,
-    'Não respondeu ao fato esportivo e manteve atendimento da loja.',
-    'Resposta esportiva indevida ou ausência de redirecionamento verificável para a loja.');
+
+  const recusou =
+    /expirad|encerrad|vencid|inválid|invalid|não pode ser (?:utilizad|usad|aplicad)/i.test(texto);
+
+  return resultado(
+    recusou,
+    'A Lia informou que o cupom não pode ser utilizado.',
+    'A Lia não recusou explicitamente o cupom encerrado.'
+  );
 }
 
 module.exports = {
@@ -93,5 +128,6 @@ module.exports = {
   verificarCupomEncerrado,
   verificarFerramentaPedido,
   verificarForaEscopoCopa,
-  verificarRegistroFerramentas
+  verificarRegistroFerramentas,
+  verificarRecusaCupom
 };

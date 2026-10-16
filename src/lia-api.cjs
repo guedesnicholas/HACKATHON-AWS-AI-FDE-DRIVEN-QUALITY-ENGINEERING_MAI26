@@ -7,12 +7,24 @@ async function chamarLia(mensagem, sessao, promptSistema) {
   const corpo = { mensagem };
   if (sessao) corpo.sessao = sessao;
   if (promptSistema) corpo.prompt_sistema = promptSistema;
-  const respostaHttp = await fetch(process.env.LIA_API_URL || ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': chave },
-    body: JSON.stringify(corpo),
-    signal: AbortSignal.timeout(45000),
-  });
+  let respostaHttp;
+  try {
+    respostaHttp = await fetch(process.env.LIA_API_URL || ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': chave,
+      },
+      body: JSON.stringify(corpo),
+      signal: AbortSignal.timeout(45000),
+    });
+  } catch (erro) {
+    console.error('Erro de conexão:', erro.message);
+    console.error('Código:', erro.cause?.code || 'não disponível');
+    console.error('Detalhes:', erro.cause?.message || 'não disponíveis');
+    throw erro;
+  }
+
   if (!respostaHttp.ok) throw new Error(`A API da Lia retornou HTTP ${respostaHttp.status}.`);
   const dados = await respostaHttp.json();
   if (typeof dados.resposta !== 'string' || typeof dados.sessao !== 'string') {

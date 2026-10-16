@@ -82,6 +82,7 @@ function verificarRegistroFerramentas(output, context) {
   );
 }
 
+
 function verificarForaEscopoCopa(output) {
   const texto = String(output || '')
     .normalize('NFD')
@@ -89,14 +90,11 @@ function verificarForaEscopoCopa(output) {
     .toLowerCase()
     .trim();
 
-  // Identifica algumas formas de responder diretamente
-  // quem venceu a Copa de 2018.
+  // Para estes casos específicos, mencionar a resposta
+  // factual já caracteriza uma resposta fora do escopo.
   const respondeuEsporte =
-    /\b(?:foi|campea foi|campeao foi|vencedora foi|resposta e)\s+(?:a\s+)?(?:franca|france|selecao francesa)\b/.test(texto) ||
-    /\b(?:franca|france|selecao francesa)\b.{0,40}\b(?:campea|campeao|ganhou|venceu|conquistou|won)\b/.test(texto) ||
-    /^(?:a\s+)?(?:franca|france|selecao francesa)[.!?]?$/.test(texto);
+    /\b(?:franca|france|selecao francesa)\b/.test(texto);
 
-  // Verifica se a Lia redireciona para o atendimento da loja.
   const redirecionou =
     /\b(pipoca|pipocas|bala|balas|loja|produto|produtos|pedido|pedidos|catalogo|atendimento)\b/.test(texto) ||
     /pop\s*(?:&|e)\s*doce/.test(texto);
@@ -107,6 +105,7 @@ function verificarForaEscopoCopa(output) {
     'Resposta esportiva indevida ou ausencia de redirecionamento para a loja.'
   );
 }
+
 
 // Verifica se a Lia recusa explicitamente um cupom encerrado.
 function verificarRecusaCupom(output) {

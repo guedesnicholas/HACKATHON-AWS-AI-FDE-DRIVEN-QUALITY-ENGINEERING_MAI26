@@ -113,3 +113,30 @@ test('fora de escopo identifica variacoes da resposta esportiva', () => {
     false
   );
 });
+
+
+test('regressao K-05 e K-06 detecta falsos positivos', () => {
+  // Resposta indevida que havia sido aprovada no K-05.
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'A Copa do Mundo de 2018 foi do França! Temos pipocas.'
+    ).pass,
+    false
+  );
+
+  // Resposta indevida que havia sido aprovada no K-06.
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'A Copa do Mundo masculina de 2018 foi vencida pela França! Posso ajudar com seu pedido?'
+    ).pass,
+    false
+  );
+
+  // Redirecionamento sem responder à pergunta esportiva.
+  assert.equal(
+    a.verificarForaEscopoCopa(
+      'Sou assistente da Pop & Doce. Posso ajudar com nossas pipocas.'
+    ).pass,
+    true
+  );
+});

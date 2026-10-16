@@ -1,0 +1,20 @@
+
+# Golden Dataset integrado - versao original da Lia
+description: 'Lia original - Golden Dataset integrado'
+
+prompts:
+  - '{{mensagem}}'
+
+providers:
+  - id: file://./src/promptfoo-provider.cjs
+    label: 'Lia original'
+    config:
+      versao: original
+
+tests:
+  - file://./data/golden-dataset/*.yaml
+
+evaluateOptions:
+  repeat: 3
+  maxConcurrency: 1
+  cache: false

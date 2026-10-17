@@ -121,6 +121,51 @@ function verificarRecusaCupom(output) {
   );
 }
 
+// Verifica se a Lia acionou a ferramenta de validacao
+// com o codigo de cupom esperado.
+function verificarValidacaoCupom(output, context) {
+  const cupom = String(
+    context.vars?.cupom_esperado || ''
+  ).trim().toUpperCase();
+
+  if (!cupom) {
+    return resultado(
+      false,
+      '',
+      'Informe cupom_esperado no caso.'
+    );
+  }
+
+  const ferramentas = obterFerramentas(context);
+
+  const encontrou = ferramentas.some(item => {
+    const acao = String(item.ferramenta || '')
+      .split('___')
+      .pop();
+
+    const entrada = item.entrada || {};
+
+    const ferramentaCorreta =
+      /^(validar|verificar)_cupom$/i.test(acao);
+
+    const codigoCorreto = [
+      entrada.codigo,
+      entrada.codigo_cupom,
+      entrada.cupom
+    ].some(valor =>
+      String(valor || '').trim().toUpperCase() === cupom
+    );
+
+    return ferramentaCorreta && codigoCorreto;
+  });
+
+  return resultado(
+    encontrou,
+    'Ferramenta de cupom acionada com o codigo correto.',
+    `Nao foi identificada validacao do cupom ${cupom}.`
+  );
+}
+
 module.exports = {
   verificarFerramenta,
   verificarConsultaPedido,
@@ -128,5 +173,6 @@ module.exports = {
   verificarFerramentaPedido,
   verificarForaEscopoCopa,
   verificarRegistroFerramentas,
-  verificarRecusaCupom
+  verificarRecusaCupom,
+  verificarValidacaoCupom
 };

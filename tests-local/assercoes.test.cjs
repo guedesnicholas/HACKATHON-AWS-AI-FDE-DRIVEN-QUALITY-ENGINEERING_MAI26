@@ -139,4 +139,45 @@ test('regressao K-05 e K-06 detecta falsos positivos', () => {
     ).pass,
     true
   );
+}); 
+
+test('L-06 exige validacao do cupom correto', () => {
+  const vars = {
+    cupom_esperado: 'PIPOCA20'
+  };
+
+  const correta = [{
+    ferramenta: 'pedidos-e-cupons___validar_cupom',
+    entrada: { codigo: 'PIPOCA20' }
+  }];
+
+  const codigoErrado = [{
+    ferramenta: 'pedidos-e-cupons___validar_cupom',
+    entrada: { codigo: 'OUTRO' }
+  }];
+
+  const ferramentaErrada = [{
+    ferramenta: 'pedidos-e-cupons___consultar_pedido',
+    entrada: { codigo: 'PIPOCA20' }
+  }];
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, correta)).pass,
+    true
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, codigoErrado)).pass,
+    false
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, ferramentaErrada)).pass,
+    false
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, [])).pass,
+    false
+  );
 });

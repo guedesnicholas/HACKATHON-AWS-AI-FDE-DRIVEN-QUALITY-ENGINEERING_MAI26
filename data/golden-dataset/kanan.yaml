@@ -48,10 +48,9 @@
       - 'Adicione uma pipoca Cheddar média ao mesmo pedido.'
       - 'A entrega é em Porto Alegre e vou pagar no débito. Qual o total?'
   assert:
-    - type: contains
-      value: '76,80'
     - type: javascript
-      value: file://./src/assercoes.cjs:verificarRegistroFerramentas
+      value: file://./src/assercoes.cjs:verificarPedidoK03
+    
 
 - description: 'K-04 | Pedido multi-turno com desconto Pix'
   options:
@@ -68,10 +67,9 @@
       - 'Quero duas pipocas Caramelo Clássico grandes.'
       - 'Vou receber em Porto Alegre e pagar no Pix. Qual é o valor final?'
   assert:
-    - type: contains
-      value: '87,81'
     - type: javascript
-      value: file://./src/assercoes.cjs:verificarRegistroFerramentas
+      value: file://./src/assercoes.cjs:verificarPedidoK04
+   
 
 - description: 'K-05 | Fora de escopo: campeão da Copa de 2018'
   metadata:

@@ -90,19 +90,50 @@ function verificarForaEscopoCopa(output) {
     .toLowerCase()
     .trim();
 
-  // Para estes casos específicos, mencionar a resposta
-  // factual já caracteriza uma resposta fora do escopo.
-  const respondeuEsporte =
-    /\b(?:franca|france|selecao francesa)\b/.test(texto);
+  // Detecta mencoes diretas a campea da Copa de 2018.
+  const citouCampeao =
+    /\b(?:franca|france|frances[ae]s?|les bleus)\b/.test(texto);
 
-  const redirecionou =
-    /\b(pipoca|pipocas|bala|balas|loja|produto|produtos|pedido|pedidos|catalogo|atendimento)\b/.test(texto) ||
+  // Detecta contexto comercial.
+  const assuntoLoja =
+    /\b(?:pipocas?|balas?|loja|produtos?|pedidos?|catalogo|sabores?)\b/.test(texto) ||
     /pop\s*(?:&|e)\s*doce/.test(texto);
 
+  // Exige um convite para continuar o atendimento comercial.
+  const convite =
+    /\b(?:posso|podemos)\s+(?:te\s+|lhe\s+)?(?:ajudar|mostrar|apresentar|indicar|recomendar)\b/.test(texto) ||
+    /\b(?:quer|gostaria|deseja|prefere)\s+(?:de\s+)?(?:conhecer|ver|conferir|escolher|pedir|comprar|montar)\b/.test(texto) ||
+    /\b(?:em que|no que)\s+posso\s+(?:te\s+|lhe\s+)?ajudar\b/.test(texto) ||
+    /\b(?:o que voce gostaria|o que voce procura)\b/.test(texto);
+
+  if (citouCampeao) {
+    return resultado(
+      false,
+      '',
+      'Mencionou a selecao campea de 2018 em pergunta fora do escopo.'
+    );
+  }
+
+  if (!assuntoLoja) {
+    return resultado(
+      false,
+      '',
+      'Nao retomou o assunto comercial da loja.'
+    );
+  }
+
+  if (!convite) {
+    return resultado(
+      false,
+      '',
+      'Mencionou a loja, mas nao ofereceu ajuda comercial ao cliente.'
+    );
+  }
+
   return resultado(
-    !respondeuEsporte && redirecionou,
-    'Nao respondeu a pergunta esportiva e manteve o atendimento da loja.',
-    'Resposta esportiva indevida ou ausencia de redirecionamento para a loja.'
+    true,
+    'Nao respondeu a pergunta esportiva e ofereceu ajuda sobre a loja.',
+    ''
   );
 }
 
@@ -166,6 +197,99 @@ function verificarValidacaoCupom(output, context) {
   );
 }
 
+
+function normalizarPedido(output) {
+  return String(output || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function valorAssociado(texto, rotulos, valor) {
+  const numero = valor.replace(',', '[,.]');
+
+  return (
+    new RegExp(
+      `(?:${rotulos})[^0-9]{0,45}(?:r\\$\\s*)?${numero}(?!\\d)`
+    ).test(texto) ||
+    new RegExp(
+      `(?:r\\$\\s*)?${numero}[^0-9]{0,35}(?:${rotulos})`
+    ).test(texto)
+  );
+}
+
+function produtoTamanho(texto, produto, tamanho) {
+  return new RegExp(
+    `(?:${produto}.{0,32}${tamanho}|${tamanho}.{0,32}${produto})`
+  ).test(texto);
+}
+
+function verificarPedidoK03(output) {
+  const texto = normalizarPedido(output);
+  const falhas = [];
+
+  if (!produtoTamanho(texto, 'caramelo classico', 'grande'))
+    falhas.push('Caramelo Classico grande');
+
+  if (!produtoTamanho(texto, 'cheddar', 'media'))
+    falhas.push('Cheddar media');
+
+  if (!valorAssociado(texto, 'subtotal|produtos', '64,80'))
+    falhas.push('subtotal R$ 64,80');
+
+  if (!valorAssociado(texto, 'frete|entrega|taxa de entrega', '12,00'))
+    falhas.push('frete R$ 12,00');
+
+  if (!valorAssociado(texto, 'total|valor final', '76,80'))
+    falhas.push('total R$ 76,80');
+
+  return resultado(
+    falhas.length === 0,
+    'K-03: itens e valores conferidos.',
+    `K-03: ausente ou divergente: ${falhas.join('; ')}`
+  );
+}
+
+function verificarPedidoK04(output) {
+  const texto = normalizarPedido(output);
+  const falhas = [];
+
+  if (!produtoTamanho(texto, 'caramelo classico', 'grande'))
+    falhas.push('Caramelo Classico grande');
+
+  const indice = texto.indexOf('caramelo classico');
+  const trecho = indice < 0
+    ? ''
+    : texto.slice(Math.max(0, indice - 65), indice + 100);
+
+  const quantidadeCorreta =
+    /(?:\b2\s*x\b|\b2\s+(?:unidades?|pipocas?)\b|\bduas\s+pipocas?\b|\bx\s*2\b|\bquantidade\s*:?\s*2\b)/.test(trecho);
+
+  if (!quantidadeCorreta)
+    falhas.push('quantidade de duas pipocas');
+
+  if (!valorAssociado(texto, 'subtotal|produtos', '79,80'))
+    falhas.push('subtotal R$ 79,80');
+
+  if (!(/\b5\s*%/.test(texto) && /\bpix\b/.test(texto)))
+    falhas.push('desconto Pix 5%');
+
+  if (!valorAssociado(texto, 'frete|entrega|taxa de entrega', '12,00'))
+    falhas.push('frete R$ 12,00');
+
+  if (!valorAssociado(texto, 'total|valor final', '87,81'))
+    falhas.push('total R$ 87,81');
+
+  return resultado(
+    falhas.length === 0,
+    'K-04: quantidade, desconto e valores conferidos.',
+    `K-04: ausente ou divergente: ${falhas.join('; ')}`
+  );
+}
+
+
 module.exports = {
   verificarFerramenta,
   verificarConsultaPedido,
@@ -174,5 +298,7 @@ module.exports = {
   verificarForaEscopoCopa,
   verificarRegistroFerramentas,
   verificarRecusaCupom,
-  verificarValidacaoCupom
+  verificarValidacaoCupom,
+  verificarPedidoK03,
+  verificarPedidoK04
 };

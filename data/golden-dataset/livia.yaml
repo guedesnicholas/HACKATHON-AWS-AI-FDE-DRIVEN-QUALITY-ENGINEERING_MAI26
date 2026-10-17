@@ -25,7 +25,7 @@
     categoria: montagem_e_calculo_de_pedidos
     fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
     criterio: 'Informar o preço correto do Kit Festa: R$ 219,90.'
-    par_metamorfico: M-03
+    par_metamorfico: M-06
   vars:
     mensagem: 'Qual é o valor do Kit Festa da Pop & Doce?'
   assert:
@@ -39,7 +39,7 @@
     categoria: montagem_e_calculo_de_pedidos
     fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
     criterio: 'Preservar o preço correto do Kit Festa mesmo quando a pergunta é formulada de outra maneira.'
-    par_metamorfico: M-03
+    par_metamorfico: M-06
   vars:
     mensagem: 'Quero organizar uma festa e estou olhando as opções da Pop & Doce. Por quanto consigo comprar o Kit Festa?'
   assert:
@@ -89,18 +89,26 @@
     categoria: cupons
     fonte: 'base-de-conhecimento-oficial/04-politicas.md > Cupons públicos vigentes e Frete grátis; 01-catalogo-pipocas.md > Chocolate Belga'
     criterio: 'Cinco pipocas Chocolate Belga grandes somam R$ 249,50. O cupom concede R$ 49,90 de desconto. O valor final dos produtos é R$ 199,60 e o frete é grátis em Porto Alegre.'
+
   vars:
     mensagem: 'Quero 5 pipocas Chocolate Belga grandes com o cupom PIPOCA20. Entrega em Porto Alegre, pagamento no cartão de crédito. Qual o total?'
+    cupom_esperado: 'PIPOCA20'
+
   assert:
     - type: contains
       value: '199,60'
+
+    - type: contains
+      value: '49,90'
+
     - type: contains
       value: 'PIPOCA20'
-    - type: contains
-      value: 'gratis'
-    - type: javascript
-      value: file://./src/assercoes.cjs:verificarFerramentaPedido
 
+    - type: javascript
+      value: '/(?:frete|entrega|envio).{0,30}(?:gr[aá]tis|gratuit[oa]|sem custo)/i.test(output)'
+
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarValidacaoCupom
 
 - description: 'L-07 | Consulta do pedido PD-1001 com e-mail correto'
   metadata:

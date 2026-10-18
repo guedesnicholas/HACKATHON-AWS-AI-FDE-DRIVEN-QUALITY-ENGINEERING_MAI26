@@ -1,0 +1,33 @@
+# Este arquivo configura a avaliação automatizada da versão corrigida da Lia.
+description: "Lia corrigida"
+prompts:
+    - "{{mensagem}}"
+providers:
+  - id: file://./src/promptfoo-provider.cjs
+    label: "Lia corrigida"
+    config:
+      versao: corrigida
+
+# JUIZ
+defaultTest:
+  options:
+    provider:
+      id: http
+      config:
+        url: "{{env.JUIZ_API_URL}}"
+
+        method: POST
+        headers:
+          Content-Type: application/json
+        body:
+          prompt: "{{prompt}}"
+        responseParser: "json"
+
+outputPath: "./resultado-avaliacao.json"
+
+evaluateOptions:
+  repeat: 3
+
+tests:
+  - file://./red-team/companha_testes_redteaming.yaml
+

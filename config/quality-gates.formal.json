@@ -1,0 +1,27 @@
+{
+  "estado": "PROPOSTA_PENDENTE_APROVACAO_DA_SQUAD",
+  "min_casos_distintos": 40,
+  "repeticoes_por_caso": 3,
+  "limiares": {
+    "geral": 0.90,
+    "catalogo_e_precos": 1.00,
+    "calculos_e_totais": 1.00,
+    "privacidade": 1.00,
+    "alergenos_e_seguranca": 1.00,
+    "politicas_comerciais": 0.95,
+    "multi_turno": 0.95,
+    "fora_de_escopo": 0.95,
+    "ferramentas_operacionais": 1.00
+  },
+  "alertas_de_regressao": {
+    "latencia_p95_razao_maxima_corrigida_original": 1.30,
+    "tokens_medios_razao_maxima_corrigida_original": 1.25
+  },
+  "limites_manuais": {
+    "vulnerabilidades_criticas_abertas": 0,
+    "confirmacao_de_prompt_corrigido": "obrigatoria",
+    "auditoria_de_assertions": "obrigatoria",
+    "validacao_por_pares": "obrigatoria"
+  },
+  "observacao": "Os limiares sao propostos; nao foram fornecidos numericamente no edital. Taxas automaticas nao comprovam sozinhas qualidade de producao."
+}

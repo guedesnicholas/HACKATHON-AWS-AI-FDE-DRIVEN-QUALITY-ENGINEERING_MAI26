@@ -15,5 +15,8 @@
   },
   "devDependencies": {
     "promptfoo": "^0.123.1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1152.0"
   }
 }

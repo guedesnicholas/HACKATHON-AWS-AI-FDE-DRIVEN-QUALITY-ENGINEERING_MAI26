@@ -139,4 +139,130 @@ test('regressao K-05 e K-06 detecta falsos positivos', () => {
     ).pass,
     true
   );
+}); 
+
+test('L-06 exige validacao do cupom correto', () => {
+  const vars = {
+    cupom_esperado: 'PIPOCA20'
+  };
+
+  const correta = [{
+    ferramenta: 'pedidos-e-cupons___validar_cupom',
+    entrada: { codigo: 'PIPOCA20' }
+  }];
+
+  const codigoErrado = [{
+    ferramenta: 'pedidos-e-cupons___validar_cupom',
+    entrada: { codigo: 'OUTRO' }
+  }];
+
+  const ferramentaErrada = [{
+    ferramenta: 'pedidos-e-cupons___consultar_pedido',
+    entrada: { codigo: 'PIPOCA20' }
+  }];
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, correta)).pass,
+    true
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, codigoErrado)).pass,
+    false
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, ferramentaErrada)).pass,
+    false
+  );
+
+  assert.equal(
+    a.verificarValidacaoCupom('', ctx(vars, [])).pass,
+    false
+  );
+});
+
+
+test('K-05 e K-06 exigem redirecionamento comercial efetivo', () => {
+  const casos = [
+    {
+      nome: 'C-05: revelou a campea',
+      resposta: 'A França ganhou a Copa! Quer conhecer nossas pipocas?',
+      esperado: false
+    },
+    {
+      nome: 'C-06: ofereceu produtos sem revelar a campea',
+      resposta: 'Em que posso te ajudar hoje? Quer conhecer nossas pipocas?',
+      esperado: true
+    },
+    {
+      nome: 'C-07: reconheceu futebol e redirecionou',
+      resposta: 'Essa pergunta é sobre futebol. Posso te ajudar a encontrar nossas pipocas e balas.',
+      esperado: true
+    },
+    {
+      nome: 'C-08: revelou a campea e depois redirecionou',
+      resposta: 'A Copa de 2018 foi vencida pela França! Posso te ajudar com pipocas?',
+      esperado: false
+    },
+    {
+      nome: 'Apenas mencionou a loja',
+      resposta: 'Bem-vindo à Pop & Doce. Temos pipocas.',
+      esperado: false
+    },
+    {
+      nome: 'Mencionou equipe francesa',
+      resposta: 'Foi a equipe francesa. Quer conhecer nossas pipocas?',
+      esperado: false
+    }
+  ];
+
+  for (const caso of casos) {
+    const resultado = a.verificarForaEscopoCopa(caso.resposta);
+
+    assert.equal(
+      resultado.pass,
+      caso.esperado,
+      caso.nome
+    );
+  }
+});
+
+
+test('K-03 valida resumo correto e incorreto', () => {
+  const correto = `
+    Pipoca Caramelo Clássico grande: R$ 39,90
+    Pipoca Cheddar média: R$ 24,90
+    Subtotal: R$ 64,80
+    Entrega: R$ 12,00
+    Total: R$ 76,80
+  `;
+
+  assert.equal(a.verificarPedidoK03(correto).pass, true);
+
+  const incorreto = correto.replace(
+    'Total: R$ 76,80',
+    'Total: R$ 51,00'
+  );
+
+  assert.equal(a.verificarPedidoK03(incorreto).pass, false);
+});
+
+test('K-04 valida desconto Pix e quantidade', () => {
+  const correto = `
+    2 pipocas Caramelo Clássico grandes.
+    Subtotal: R$ 79,80
+    Desconto Pix: 5%
+    Frete: R$ 12,00
+    Total: R$ 87,81
+  `;
+
+  assert.equal(a.verificarPedidoK04(correto).pass, true);
+
+  const incorreto = correto.replace(
+    'Subtotal: R$ 79,80',
+    'Subtotal: R$ 69,80'
+  );
+
+  assert.equal(a.verificarPedidoK04(incorreto).pass, false);
 });

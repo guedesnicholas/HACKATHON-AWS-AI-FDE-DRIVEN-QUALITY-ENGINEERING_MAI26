@@ -1,4 +1,7 @@
 # Este arquivo reúne os casos de Kaua sobre catálogo e restrições alimentares.
+
+# --- CATÁLOGO (8 casos: KA-01 a KA-08) ---
+
 - description: 'KA-01 | Preço da Caramelo Clássico Grande'
   metadata:
     id: KA-01
@@ -12,16 +15,205 @@
   assert:
     - type: contains
       value: '39,90'
-- description: 'KA-02 | Reformulação da consulta de preço'
+
+- description: 'KA-02 | Reformulação da consulta de preço (par metamórfico M-01)'
   metadata:
     id: KA-02
     responsavel: Kaua
     categoria: catalogo
     fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Caramelo Clássico'
-    criterio: 'Preservar o mesmo preço na reformulação.'
+    criterio: 'Preservar o mesmo preço na reformulação: R$ 39,90.'
     par_metamorfico: M-01
   vars:
     mensagem: 'Me diga o valor do tamanho grande do sabor Caramelo Clássico.'
   assert:
     - type: contains
       value: '39,90'
+
+- description: 'KA-03 | Preços da Natural sem Sal nos três tamanhos'
+  metadata:
+    id: KA-03
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Natural sem Sal'
+    criterio: 'Informar os três preços corretos: P R$ 9,90 · M R$ 16,90 · G R$ 27,90.'
+    par_metamorfico: M-02
+  vars:
+    mensagem: 'Quais os preços da pipoca Natural sem Sal nos três tamanhos?'
+  assert:
+    - type: contains
+      value: '9,90'
+    - type: contains
+      value: '16,90'
+    - type: contains
+      value: '27,90'
+
+- description: 'KA-04 | Reformulação da consulta de preços da Natural sem Sal (par metamórfico M-02)'
+  metadata:
+    id: KA-04
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Natural sem Sal'
+    criterio: 'Preservar os mesmos três preços na reformulação: P R$ 9,90 · M R$ 16,90 · G R$ 27,90.'
+    par_metamorfico: M-02
+  vars:
+    mensagem: 'Quanto a pipoca Natural sem Sal custa em cada tamanho disponível?'
+  assert:
+    - type: contains
+      value: '9,90'
+    - type: contains
+      value: '16,90'
+    - type: contains
+      value: '27,90'
+
+- description: 'KA-05 | Menta Zero Açúcar — disponibilidade de pacote 250 g'
+  metadata:
+    id: KA-05
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/02-catalogo-balas.md > Menta Zero Açúcar'
+    criterio: 'Informar que a Menta Zero Açúcar é vendida apenas no pacote de 100 g por R$ 12,90; não existe pacote de 250 g.'
+  vars:
+    mensagem: 'A Menta Zero Açúcar tem pacote de 250 g?'
+  assert:
+    - type: icontains
+      value: '100'
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao") || output.toLowerCase().includes("apenas") || output.toLowerCase().includes("somente")'
+
+- description: 'KA-06 | Preço do Pirulito Artesanal Arco-Íris'
+  metadata:
+    id: KA-06
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/02-catalogo-balas.md > Pirulito Artesanal Arco-Íris'
+    criterio: 'Informar o preço correto: R$ 7,90 por unidade de 40 g.'
+  vars:
+    mensagem: 'Quanto custa o Pirulito Artesanal Arco-Íris?'
+  assert:
+    - type: contains
+      value: '7,90'
+
+- description: 'KA-07 | Kit Cinema não inclui Pistache'
+  metadata:
+    id: KA-07
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Regras gerais dos kits'
+    criterio: 'Informar que o Kit Cinema não inclui Pistache; Pistache e edições sazonais não fazem parte de nenhum kit.'
+  vars:
+    mensagem: 'O Kit Cinema inclui o sabor Pistache?'
+  assert:
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao")'
+    - type: icontains
+      value: 'kit'
+
+- description: 'KA-08 | Kit Festa — total com Pix e frete grátis para Porto Alegre'
+  metadata:
+    id: KA-08
+    responsavel: Kaua
+    categoria: catalogo
+    fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kit Festa; 04-politicas.md > Pix, frete grátis'
+    criterio: 'Informar preço R$ 219,90; com Pix 5% o total fica R$ 208,90; frete grátis para Porto Alegre pois valor após desconto (R$ 208,90) supera R$ 150.'
+  vars:
+    mensagem: 'Quanto custa o Kit Festa? Se eu pagar no Pix e entregar em Porto Alegre, tenho frete grátis?'
+  assert:
+    - type: contains
+      value: '219,90'
+    - type: javascript
+      value: 'output.toLowerCase().includes("208,90") || output.toLowerCase().includes("208.90")'
+    - type: javascript
+      value: 'output.toLowerCase().includes("grátis") || output.toLowerCase().includes("gratis") || output.toLowerCase().includes("gratuito")'
+
+# --- ALÉRGENOS E RESTRIÇÕES ALIMENTARES (6 casos: KA-09 a KA-14) ---
+
+- description: 'KA-09 | Chipotle com Limão — vegana, mas com aviso de alérgenos da cozinha'
+  metadata:
+    id: KA-09
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Chipotle com Limão; Aviso geral de alérgenos'
+    criterio: 'Confirmar que é vegana e sem alergênicos na receita, mas mencionar o aviso geral de alérgenos da cozinha (traços de amendoim, castanhas, leite, soja e trigo).'
+    par_metamorfico: M-03
+  vars:
+    mensagem: 'A pipoca Chipotle com Limão é vegana e sem alérgenos?'
+  assert:
+    - type: icontains
+      value: 'vegana'
+    - type: javascript
+      value: 'output.toLowerCase().includes("traço") || output.toLowerCase().includes("cozinha") || output.toLowerCase().includes("manipula") || output.toLowerCase().includes("amendoim")'
+
+- description: 'KA-10 | Reformulação da consulta de alérgenos da Chipotle (par metamórfico M-03)'
+  metadata:
+    id: KA-10
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Chipotle com Limão; Aviso geral de alérgenos'
+    criterio: 'Preservar a resposta do KA-09 na reformulação: confirmar vegana, alertar sobre traços da cozinha.'
+    par_metamorfico: M-03
+  vars:
+    mensagem: 'Posso comer a Chipotle com Limão sendo vegana e tendo alergia grave?'
+  assert:
+    - type: icontains
+      value: 'vegana'
+    - type: javascript
+      value: 'output.toLowerCase().includes("traço") || output.toLowerCase().includes("cozinha") || output.toLowerCase().includes("manipula") || output.toLowerCase().includes("amendoim")'
+
+- description: 'KA-11 | Cookies & Cream contém glúten'
+  metadata:
+    id: KA-11
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/01-catalogo-pipocas.md > Cookies & Cream'
+    criterio: 'Informar que a Cookies & Cream NÃO é sem glúten — contém trigo (biscoito de chocolate triturado).'
+  vars:
+    mensagem: 'A pipoca Cookies & Cream é sem glúten?'
+  assert:
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao") || output.toLowerCase().includes("contém glúten") || output.toLowerCase().includes("contem gluten") || output.toLowerCase().includes("trigo")'
+
+- description: 'KA-12 | Ursinhos Frutas Vermelhas não é vegano — gelatina bovina'
+  metadata:
+    id: KA-12
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/02-catalogo-balas.md > Ursinhos Frutas Vermelhas'
+    criterio: 'Informar que os Ursinhos Frutas Vermelhas NÃO são veganos pois contêm gelatina bovina.'
+  vars:
+    mensagem: 'Os Ursinhos Frutas Vermelhas são veganos?'
+  assert:
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao")'
+    - type: javascript
+      value: 'output.toLowerCase().includes("gelatina") || output.toLowerCase().includes("bovina") || output.toLowerCase().includes("animal")'
+
+- description: 'KA-13 | Pirulito Arco-Íris — não indicado para menores de 4 anos'
+  metadata:
+    id: KA-13
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/02-catalogo-balas.md > Balas duras e pirulitos'
+    criterio: 'Informar que pirulitos e balas duras não são indicados para crianças menores de 4 anos por risco de engasgo.'
+  vars:
+    mensagem: 'Meu filho de 3 anos pode chupar o Pirulito Artesanal Arco-Íris?'
+  assert:
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao") || output.toLowerCase().includes("indicado") || output.toLowerCase().includes("engasgo")'
+    - type: javascript
+      value: 'output.toLowerCase().includes("4 anos") || output.toLowerCase().includes("quatro anos") || output.toLowerCase().includes("engasgo")'
+
+- description: 'KA-14 | Menta Zero Açúcar — xilitol é tóxico para cães'
+  metadata:
+    id: KA-14
+    responsavel: Kaua
+    categoria: alergenos-e-restricoes
+    fonte: 'base-de-conhecimento-oficial/02-catalogo-balas.md > Menta Zero Açúcar'
+    criterio: 'Alertar que a Menta Zero Açúcar contém xilitol, que é tóxico para cães; não deve ser oferecida a animais.'
+  vars:
+    mensagem: 'A Menta Zero Açúcar pode ser dada para o meu cachorro?'
+  assert:
+    - type: javascript
+      value: 'output.toLowerCase().includes("não") || output.toLowerCase().includes("nao")'
+    - type: javascript
+      value: 'output.toLowerCase().includes("xilitol") || output.toLowerCase().includes("tóxico") || output.toLowerCase().includes("toxico")'

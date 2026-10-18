@@ -25,7 +25,7 @@
     categoria: montagem_e_calculo_de_pedidos
     fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
     criterio: 'Informar o preço correto do Kit Festa: R$ 219,90.'
-    par_metamorfico: M-03
+    par_metamorfico: M-06
   vars:
     mensagem: 'Qual é o valor do Kit Festa da Pop & Doce?'
   assert:
@@ -39,7 +39,7 @@
     categoria: montagem_e_calculo_de_pedidos
     fonte: 'base-de-conhecimento-oficial/03-kits-e-presentes.md > Kits > Kit Festa'
     criterio: 'Preservar o preço correto do Kit Festa mesmo quando a pergunta é formulada de outra maneira.'
-    par_metamorfico: M-03
+    par_metamorfico: M-06
   vars:
     mensagem: 'Quero organizar uma festa e estou olhando as opções da Pop & Doce. Por quanto consigo comprar o Kit Festa?'
   assert:
@@ -62,6 +62,7 @@
     - type: contains
       value: 'mínimo'
 
+
 - description: 'L-05 | Cupom encerrado NATAL2025 não pode ser aplicado'
   metadata:
     id: L-05
@@ -71,11 +72,15 @@
     criterio: 'O cupom NATAL2025 encerrou em 31/12/2025 e deve ser recusado.'
   vars:
     mensagem: 'Quero usar o cupom NATAL2025 no meu pedido de 2 pipocas Caramelo Clássico grandes.'
+    cupom_esperado: 'NATAL2025'
   assert:
     - type: contains
       value: 'NATAL2025'
-    - type: contains
-      value: 'encerrad'
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarRecusaCupom
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarCupomEncerrado
+
 
 - description: 'L-06 | Cupom PIPOCA20 em pedido acima de R$ 200,00'
   metadata:
@@ -84,52 +89,70 @@
     categoria: cupons
     fonte: 'base-de-conhecimento-oficial/04-politicas.md > Cupons públicos vigentes e Frete grátis; 01-catalogo-pipocas.md > Chocolate Belga'
     criterio: 'Cinco pipocas Chocolate Belga grandes somam R$ 249,50. O cupom concede R$ 49,90 de desconto. O valor final dos produtos é R$ 199,60 e o frete é grátis em Porto Alegre.'
+
   vars:
     mensagem: 'Quero 5 pipocas Chocolate Belga grandes com o cupom PIPOCA20. Entrega em Porto Alegre, pagamento no cartão de crédito. Qual o total?'
+    cupom_esperado: 'PIPOCA20'
+
   assert:
     - type: contains
       value: '199,60'
+
+    - type: contains
+      value: '49,90'
+
     - type: contains
       value: 'PIPOCA20'
 
+    - type: javascript
+      value: '/(?:frete|entrega|envio).{0,30}(?:gr[aá]tis|gratuit[oa]|sem custo)/i.test(output)'
+
+    - type: javascript
+      value: file://./src/assercoes.cjs:verificarValidacaoCupom
 
 - description: 'L-07 | Consulta do pedido PD-1001 com e-mail correto'
   metadata:
     id: L-07
     responsavel: Livia
     categoria: consulta_de_pedidos
-    fonte: 'massa-de-teste.md > PD-1001; 04-politicas.md > Consulta de pedidos'
+    fonte: 'base-de-conhecimento-oficial/massa-de-teste.md > PD-1001; base-de-conhecimento-oficial/04-politicas.md > Consulta de pedidos'
     criterio: 'Com o número do pedido e o e-mail correto, informar que foi entregue em 28/09/2026 e que o total foi R$ 73,56.'
   vars:
     mensagem: 'Quero consultar o pedido PD-1001. Meu e-mail é ana.souza@example.com.'
+    numero_pedido_esperado: 'PD-1001'
+    email_esperado: 'ana.souza@example.com'
     ferramenta_esperada: 'pedidos-e-cupons___consultar_pedido'
+
   assert:
     - type: contains
       value: '28/09/2026'
     - type: contains
       value: '73,56'
     - type: javascript
-      value: file://./src/assercoes.cjs:verificarFerramenta
+      value: file://./src/assercoes.cjs:verificarConsultaPedido
 
 - description: 'L-08 | Consulta do pedido PD-1005 cancelado'
   metadata:
     id: L-08
     responsavel: Livia
     categoria: consulta_de_pedidos
-    fonte: 'massa-de-teste.md > PD-1005; 04-politicas.md > Formas de pagamento e Consulta de pedidos'
+    fonte: 'base-de-conhecimento-oficial/massa-de-teste.md > PD-1005; 04-politicas.md > Formas de pagamento e Consulta de pedidos'
     criterio: 'Informar que o pedido foi cancelado porque o Pix não foi pago em 30 minutos. O total registrado é R$ 155,92.'
   vars:
     mensagem: 'Pode consultar o pedido PD-1005? Meu e-mail é elisa.ferreira@example.com.'
-    ferramenta_esperada: 'pedidos-e-cupons___consultar_pedido'
+    numero_pedido_esperado: 'PD-1005'
+    email_esperado: 'elisa.ferreira@example.com'
   assert:
     - type: contains
       value: 'cancelado'
     - type: contains
       value: '155,92'
     - type: javascript
-      value: file://./src/assercoes.cjs:verificarFerramenta
+      value: file://./src/assercoes.cjs:verificarConsultaPedido
 
 - description: 'L-09 | Pedido montado em turnos e consulta sobre promoção'
+  options:
+    disableVarExpansion: true
   metadata:
     id: L-09
     responsavel: Livia
@@ -150,6 +173,8 @@
       value: '100'
 
 - description: 'L-10 | Mudança de cartão para Pix e recálculo do total'
+  options:
+    disableVarExpansion: true
   metadata:
     id: L-10
     responsavel: Livia

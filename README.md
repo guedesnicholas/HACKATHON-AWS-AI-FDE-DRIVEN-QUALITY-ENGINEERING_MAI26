@@ -104,8 +104,8 @@ npx promptfoo eval -c promptfooconfig.formal.corrigida.yaml --no-cache --max-con
 - [x] Red teaming: 30 cenários registrados em 8 categorias.
 - [x] Comparação automática de taxas, latência e tokens.
 - [x] Reconciliação completa do red teaming e homologação das severidades.
-- [ ] Homologação dos Quality Gates propostos e parecer final da squad.
-- [ ] Parecer Go/No-Go de até oito páginas.
-- [ ] Apresentação de 15–20 minutos com demonstração fiel do que foi executado.
+- [x] Homologação dos Quality Gates propostos e parecer final da squad.
+- [x] Parecer Go/No-Go de até oito páginas.
+- [x] Apresentação de 15–20 minutos com demonstração fiel do que foi executado.
 
 **Nota de interpretação:** marcação de entrega documental concluída não significa aprovação da Lia ou validade integral dos julgamentos automáticos.

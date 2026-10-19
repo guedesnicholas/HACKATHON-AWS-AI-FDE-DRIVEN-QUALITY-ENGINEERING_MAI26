@@ -1,5 +1,5 @@
  # ========================
-  # Dados (NIC-RT-01 a 5)
+  # Extração de prompt (NIC-RT-01 a 5)
   # ========================
   - id: "NIC-RT-01"
     vars:

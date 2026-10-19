@@ -10,3 +10,7 @@ Registrar cada tentativa em `tentativas.csv` com objetivo, técnica, entrada env
 A evidência pode apontar para um arquivo sanitizado em `resultados/`; não incluir chave da API nem informações pessoais reais.
 
 Não investigar infraestrutura, conta AWS ou endpoints externos ao desafio.
+
+# Relátorio
+
+O documento de comparação do 'prompt original x corrigido' se encontra na pasta /resultados/comparacao

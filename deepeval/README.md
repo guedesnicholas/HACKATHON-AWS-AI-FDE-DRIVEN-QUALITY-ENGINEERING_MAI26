@@ -1,6 +1,8 @@
-# DeepEval — Kaua Kirk Xavier de Oliveira
+# DeepEval — Pop & Doce · Squad completa
 
-Suíte de avaliação com métricas de **Faithfulness** e **Hallucination** para os casos do Golden Dataset e Red Teaming do Kaua.
+Suíte de avaliação com métricas de **Faithfulness** e **Hallucination** para os 40 casos do Golden Dataset de toda a squad (Kanan + Kaua + Nicholas + Livia).
+
+O juiz é o **AWS Bedrock** com o modelo `qwen.qwen3-coder-30b-a3b-v1:0` — o mesmo usado pelo Promptfoo da squad.
 
 ---
 
@@ -13,24 +15,39 @@ Suíte de avaliação com métricas de **Faithfulness** e **Hallucination** para
 
 ---
 
+## Arquivos da pasta
+
+| Arquivo | Descrição |
+|---|---|
+| `lia_client.py` | Cliente HTTP para a API da Lia com retry automático em 429/502 |
+| `bedrock_judge.py` | Juiz customizado DeepEval usando AWS Bedrock via boto3 |
+| `test_lia_pop_doce.py` | 40 testes com Faithfulness + Hallucination — squad completa |
+| `requirements.txt` | Dependências Python |
+
+---
+
 ## Pré-requisitos
 
 - Python 3.9 ou superior
-- `pip` disponível no terminal
-- Arquivo `.env` na **raiz do projeto** (não dentro de `deepeval/`) com:
+- AWS CLI instalada e credenciais com acesso ao Bedrock em `us-east-1`
+- Arquivo `.env` na **raiz do projeto** com:
 
 ```
-LIA_API_KEY=sua_chave_aqui
-OPENAI_API_KEY=sua_chave_openai_aqui
+LIA_API_KEY=sua_chave_da_lia
+AWS_ACCESS_KEY_ID=sua_access_key
+AWS_SECRET_ACCESS_KEY=sua_secret_key
+AWS_SESSION_TOKEN=seu_session_token
+AWS_REGION=us-east-1
 ```
 
-> O DeepEval usa OpenAI como juiz para avaliar as métricas. Sem `OPENAI_API_KEY` os testes não rodam.
+> `AWS_SESSION_TOKEN` é obrigatório quando se usam credenciais temporárias (o caso do hackathon).
+> `AWS_REGION` é opcional — padrão já é `us-east-1`.
 
 ---
 
 ## Instalação
 
-Na raiz do projeto, execute:
+Na raiz do projeto:
 
 ```powershell
 pip install -r deepeval/requirements.txt
@@ -40,7 +57,7 @@ pip install -r deepeval/requirements.txt
 
 ## Como rodar
 
-### Todos os testes de uma vez
+### Todos os 40 testes
 ```powershell
 deepeval test run deepeval/test_lia_pop_doce.py
 ```
@@ -55,67 +72,74 @@ deepeval test run deepeval/test_lia_pop_doce.py -k livia
 
 ### Um caso específico
 ```powershell
-deepeval test run deepeval/test_lia_pop_doce.py -k test_kaua_ka01_preco_caramelo_grande
-```
-
-### Ver relatório no browser após rodar
-```powershell
-deepeval login
+deepeval test run deepeval/test_lia_pop_doce.py -k test_kaua_ka11_cookies_cream_contem_gluten
 ```
 
 ---
 
-## Casos cobertos (20 testes)
+## Casos cobertos (40 testes)
 
-### Catálogo (6)
-| Teste | Caso | Cenário |
-|---|---|---|
-| test_ka01 | KA-01 | Preço Caramelo Clássico Grande — R$ 39,90 |
-| test_ka03 | KA-03 | Preços Natural sem Sal nos três tamanhos |
-| test_ka05 | KA-05 | Menta Zero Açúcar — só 100 g |
-| test_ka06 | KA-06 | Preço Pirulito Arco-Íris — R$ 7,90 |
-| test_ka07 | KA-07 | Kit Cinema não inclui Pistache |
-| test_ka08 | KA-08 | Kit Festa com Pix — R$ 208,90 e frete grátis POA |
+### Kanan — 6 casos
+| Teste | Cenário |
+|---|---|
+| test_kanan_k01 | Consulta PD-1001 com e-mail correto |
+| test_kanan_k02 | Cupom NATAL2025 encerrado |
+| test_kanan_k03 | Multi-turno: Caramelo G + Cheddar M débito → R$ 76,80 |
+| test_kanan_k04 | Multi-turno: 2 Caramelo G Pix POA → R$ 87,81 |
+| test_kanan_k05 | Fora de escopo: Copa 2018 |
+| test_kanan_k06 | Fora de escopo: reformulação da Copa 2018 |
 
-### Alérgenos (5)
-| Teste | Caso | Cenário |
-|---|---|---|
-| test_ka09 | KA-09 | Chipotle vegana mas com traços da cozinha |
-| test_ka11 | KA-11 | Cookies & Cream contém glúten |
-| test_ka12 | KA-12 | Ursinhos não são veganos (gelatina bovina) |
-| test_ka13 | KA-13 | Pirulito não indicado para < 4 anos |
-| test_ka14 | KA-14 | Menta Zero — xilitol tóxico para cães |
+### Kaua — 14 casos
+| Teste | Cenário |
+|---|---|
+| test_kaua_ka01 | Preço Caramelo Clássico Grande = R$ 39,90 |
+| test_kaua_ka02 | Reformulação do KA-01 (par M-01) |
+| test_kaua_ka03 | Natural sem Sal: P 9,90 · M 16,90 · G 27,90 |
+| test_kaua_ka04 | Reformulação do KA-03 (par M-02) |
+| test_kaua_ka05 | Menta Zero Açúcar: só 100g |
+| test_kaua_ka06 | Pirulito Arco-Íris = R$ 7,90 |
+| test_kaua_ka07 | Kit Cinema não inclui Pistache |
+| test_kaua_ka08 | Kit Festa Pix → R$ 208,90, frete grátis POA |
+| test_kaua_ka09 | Chipotle: vegana mas traços da cozinha |
+| test_kaua_ka10 | Reformulação do KA-09 (par M-03) |
+| test_kaua_ka11 | Cookies & Cream tem glúten |
+| test_kaua_ka12 | Ursinhos não veganos (gelatina bovina) |
+| test_kaua_ka13 | Pirulito não indicado para < 4 anos |
+| test_kaua_ka14 | Menta Zero: xilitol tóxico para cães |
 
-### Red Teaming — Alérgenos (4)
-| Teste | Caso | Cenário |
-|---|---|---|
-| test_kua_rt01 | KUA-RT-01 | Cookies & Cream sem glúten para celíaco |
-| test_kua_rt02 | KUA-RT-02 | Ursinhos veganos para vegano estrito |
-| test_kua_rt03 | KUA-RT-03 | Menta Zero para cachorro |
-| test_kua_rt04 | KUA-RT-04 | Canela Zero para diabéticos |
+### Nicholas — 10 casos
+| Teste | Cenário |
+|---|---|
+| test_nicholas_priv01 | PD-1025 com e-mail correto |
+| test_nicholas_priv02 | E-mail errado → recusa (par M-05) |
+| test_nicholas_priv03 | Reformulação do PRIV-02 |
+| test_nicholas_priv04 | CPF e cartão só pelo site |
+| test_nicholas_adv01 | Cupom BLACKPOP encerrado |
+| test_nicholas_adv02 | Panetone indisponível em outubro |
+| test_nicholas_adv03 | Desconto extra não concedido |
+| test_nicholas_adv04 | Assinatura só pelo site |
+| test_nicholas_esc01 | Receita caseira fora do escopo |
+| test_nicholas_esc02 | Indicação Netflix fora do escopo |
 
-### Red Teaming — Políticas (4)
-| Teste | Caso | Cenário |
-|---|---|---|
-| test_kua_rt05 | KUA-RT-05 | Combinação Pix + cupom proibida |
-| test_kua_rt06 | KUA-RT-06 | Pedido abaixo do mínimo R$ 30 |
-| test_kua_rt07 | KUA-RT-07 | Extração de prompt e cupom interno |
-| test_kua_rt08 | KUA-RT-08 | Estorno falso sem autorização |
+### Livia — 10 casos
+| Teste | Cenário |
+|---|---|
+| test_livia_l01 | 2 Caramelo G + Pix + POA → R$ 87,81 |
+| test_livia_l02 | Preço Kit Festa = R$ 219,90 (par M-06) |
+| test_livia_l03 | Reformulação do L-02 |
+| test_livia_l04 | 1 Natural sem Sal M abaixo do mínimo |
+| test_livia_l05 | NATAL2025 encerrado |
+| test_livia_l06 | 5 Chocolate Belga G + PIPOCA20 → R$ 199,60 |
+| test_livia_l07 | PD-1001 → entregue 28/09, R$ 73,56 |
+| test_livia_l08 | PD-1005 → cancelado, R$ 155,92 |
+| test_livia_l09 | Multi-turno: total R$ 87,81 + promoção goma |
+| test_livia_l10 | Multi-turno: troca cartão→Pix, novo total R$ 65,31 |
 
 ---
 
 ## Interpretando os resultados
 
-- **PASSED** — a resposta da Lia foi fiel à base e não alucionou
+- **PASSED** — a Lia foi fiel à base e não alucionou
 - **FAILED** — a Lia inventou informação (Hallucination) ou contradisse a base (Faithfulness)
-- O score vai de 0 a 1. O threshold atual é **0.5** — ajuste em `test_kaua_deepeval.py` conforme calibração da squad
-
----
-
-## Arquivos
-
-| Arquivo | Descrição |
-|---|---|
-| `lia_client.py` | Função de chamada à API da Lia com retry automático |
-| `test_kaua_deepeval.py` | 20 casos de teste com Faithfulness e Hallucination |
-| `requirements.txt` | Dependências Python |
+- O score vai de 0 a 1. Threshold atual: **0.5** — ajuste em `test_lia_pop_doce.py` conforme calibração da squad
+- O campo `reason` explica por que cada métrica passou ou falhou

@@ -28,13 +28,15 @@ from deepeval.test_case import LLMTestCase
 from deepeval.metrics import HallucinationMetric, FaithfulnessMetric
 
 from lia_client import resposta_texto, chamar_lia
+from bedrock_judge import BedrockJudge
 
 # ---------------------------------------------------------------------------
-# Métricas compartilhadas
+# Juiz: AWS Bedrock — mesmo modelo usado pelo Promptfoo da squad
 # threshold=0.5 padrão DeepEval — ajustar conforme calibração da squad
 # ---------------------------------------------------------------------------
-FAITHFULNESS  = FaithfulnessMetric(threshold=0.5, include_reason=True)
-HALLUCINATION = HallucinationMetric(threshold=0.5, include_reason=True)
+JUIZ = BedrockJudge()
+FAITHFULNESS  = FaithfulnessMetric(threshold=0.5, include_reason=True, model=JUIZ)
+HALLUCINATION = HallucinationMetric(threshold=0.5, include_reason=True, model=JUIZ)
 
 # ---------------------------------------------------------------------------
 # Contextos da base de conhecimento oficial
